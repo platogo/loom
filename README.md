@@ -1,6 +1,5 @@
 Loom
 ========
-[![Docs Status](http://inch-ci.org/github/asonge/loom.svg?branch=master)](http://inch-ci.org/github/asonge/loom)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg)](https://hexdocs.pm/loom)
 [![Current Release](https://img.shields.io/hexpm/v/loom.svg)](https://hex.pm/packages/loom)
 ![License Apache2](https://img.shields.io/hexpm/l/loom.svg)

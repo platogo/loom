@@ -14,10 +14,10 @@ defmodule Loom.AWORSet do
   @type actor :: term
   @type value :: term
   @opaque t :: %Set{
-    dots: Dots.t,
-    keep_delta: boolean,
-    delta: Dots.t | nil
-  }
+            dots: Dots.t(),
+            keep_delta: boolean,
+            delta: Dots.t() | nil
+          }
 
   defstruct dots: %Dots{}, keep_delta: true, delta: nil
 
@@ -32,7 +32,7 @@ defmodule Loom.AWORSet do
 
   """
   @spec new() :: t
-  def new, do: %Set{dots: Dots.new, delta: Dots.new}
+  def new, do: %Set{dots: Dots.new(), delta: Dots.new()}
 
   @doc """
   Grab the delta from an AWORSet for lower-cost synchronization.
@@ -49,7 +49,7 @@ defmodule Loom.AWORSet do
       true
   """
   @spec clear_delta(t) :: t
-  def clear_delta(%Set{}=set), do: %Set{set|delta: Dots.new}
+  def clear_delta(%Set{} = set), do: %Set{set | delta: Dots.new()}
 
   @doc """
   Add an element to an AWORSet
@@ -59,11 +59,13 @@ defmodule Loom.AWORSet do
       [1,2]
   """
   @spec add(t, actor, value) :: t
-  def add(%Set{dots: d, delta: delta_dots}=set, actor, value) do
-    {new_dots, new_delta_dots} = {d, delta_dots}
-                               |> Dots.remove(value)
-                               |> Dots.add(actor, value)
-    %Set{set|dots: new_dots, delta: new_delta_dots}
+  def add(%Set{dots: d, delta: delta_dots} = set, actor, value) do
+    {new_dots, new_delta_dots} =
+      {d, delta_dots}
+      |> Dots.remove(value)
+      |> Dots.add(actor, value)
+
+    %Set{set | dots: new_dots, delta: new_delta_dots}
   end
 
   @doc """
@@ -78,7 +80,7 @@ defmodule Loom.AWORSet do
       [2]
   """
   @spec remove(t, value) :: t
-  def remove(%Set{dots: d, delta: delta_dots}=set, value) do
+  def remove(%Set{dots: d, delta: delta_dots} = set, value) do
     if member?(set, value) do
       {new_dots, new_delta_dots} = {d, delta_dots} |> Dots.remove(value)
       %Set{dots: new_dots, delta: new_delta_dots}
@@ -98,9 +100,9 @@ defmodule Loom.AWORSet do
       []
   """
   @spec empty(t) :: t
-  def empty(%Set{dots: d, delta: delta_dots}=set) do
+  def empty(%Set{dots: d, delta: delta_dots} = set) do
     {new_dots, new_delta_dots} = Dots.remove({d, delta_dots})
-    %Set{set|dots: new_dots, delta: new_delta_dots}
+    %Set{set | dots: new_dots, delta: new_delta_dots}
   end
 
   @doc """
@@ -112,9 +114,9 @@ defmodule Loom.AWORSet do
       iex> Set.join(a, b) |> Set.value |> Enum.sort
       [1,2]
   """
-  @spec join(t,t) :: t
-  def join(%Set{dots: d1}=set, %Set{dots: d2}) do
-    %Set{set|dots: Dots.join(d1, d2)}
+  @spec join(t, t) :: t
+  def join(%Set{dots: d1} = set, %Set{dots: d2}) do
+    %Set{set | dots: Dots.join(d1, d2)}
   end
 
   @doc """
@@ -139,13 +141,11 @@ defmodule Loom.AWORSet do
   """
   @spec value(t) :: [value]
   def value(%Set{dots: d}) do
-    (for {_, v} <- Dots.dots(d), do: v) |> Enum.uniq
+    for({_, v} <- Dots.dots(d), do: v) |> Enum.uniq()
   end
-
 end
 
 defimpl Loom.CRDT, for: Loom.AWORSet do
-
   alias Loom.AWORSet, as: Set
 
   @doc """
@@ -158,7 +158,7 @@ defimpl Loom.CRDT, for: Loom.AWORSet do
     [
       update: [
         add: [:actor, :value],
-        remove: [:actor],
+        remove: [:actor]
       ],
       read: [
         is_member: [:value],
@@ -181,9 +181,11 @@ defimpl Loom.CRDT, for: Loom.AWORSet do
   def apply(crdt, {:add, actor, value}) do
     Set.add(crdt, actor, value)
   end
+
   def apply(crdt, {:remove, value}) do
     Set.remove(crdt, value)
   end
+
   def apply(crdt, {:is_member, value}), do: Set.member?(crdt, value)
   def apply(crdt, :value), do: Set.value(crdt)
 
@@ -209,5 +211,4 @@ defimpl Loom.CRDT, for: Loom.AWORSet do
 
   """
   def value(crdt), do: Set.value(crdt)
-
 end

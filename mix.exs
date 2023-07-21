@@ -34,10 +34,9 @@ defmodule Loom.Mixfile do
     [
       {:dialyze, "~> 0.1.3", only: :dev},
       {:excheck, github: "devstopfix/excheck", only: [:dev, :test]},
-      {:excoveralls, "~> 0.3", only: :dev},
+      {:excoveralls, "~> 0.16.1", only: :dev},
       {:ex_doc, "~> 0.7", only: :dev},
-      {:triq, "~> 1.3", only: [:dev, :test]},
-      {:inch_ex, "~> 2.0", only: :dev}
+      {:triq, "~> 1.3", only: [:dev, :test]}
     ]
   end
 
