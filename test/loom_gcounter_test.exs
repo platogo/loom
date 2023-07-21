@@ -3,7 +3,8 @@ defmodule LoomGcounterTest do
   use ExCheck
 
   doctest Loom.GCounter
-  doctest Loom.CRDT.Loom.GCounter # The Protocol implementation
+  # The Protocol implementation
+  doctest Loom.CRDT.Loom.GCounter
 
   # defmodule FSMTest do
   #   alias Loom.GCounter, as: Counter
@@ -21,8 +22,8 @@ defmodule LoomGcounterTest do
   #     IO.inspect {:call, :inc, [actor, int]}
   #     IO.inspect val[actor]
   #     val
-  #     |> Dict.put(:flat, f+int)
-  #     |> Dict.put(actor, Counter.inc(val[actor], actor, int))
+  #     |> Map.put(:flat, f+int)
+  #     |> Map.put(actor, Counter.inc(val[actor], actor, int))
   #   end
   #
   #   def precondition(val, {:call, _, :inc, [_, _]}) do
@@ -44,11 +45,10 @@ defmodule LoomGcounterTest do
   # end
 
   test "Stupid test for CRDT ops" do
-    assert [_,_] = Keyword.take(Loom.CRDT.ops(Loom.GCounter.new), [:update, :read])
+    assert [_, _] = Keyword.take(Loom.CRDT.ops(Loom.GCounter.new()), [:update, :read])
   end
 
   # property :fsm do
   #   FSMTest.run
   # end
-
 end
