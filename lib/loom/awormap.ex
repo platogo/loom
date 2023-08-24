@@ -58,7 +58,7 @@ defmodule Loom.AWORMap do
   """
   @spec put(t, actor, key, crdt) :: t
   def put(%M{dots: d, delta: d_dots} = m, actor, key, crdt) do
-    %{__struct__: struct_name} = crdt
+    struct_name = get_structname(crdt)
     new_crdt = CRDT.join(crdt, get(m, key, crdt))
 
     {new_dots, new_d_dots} =
